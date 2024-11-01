@@ -213,6 +213,28 @@ const deleteUser = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+const deleteUserData = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+    await User.deleteOne({ _id: user._id });
+
+    res
+      .status(200)
+      .json({ success: true, message: "Account deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -222,4 +244,5 @@ module.exports = {
   logoutUser,
   updateUser,
   searchUserByName,
+  deleteUserData,
 };

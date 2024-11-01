@@ -5,22 +5,22 @@ const mongoose = require("mongoose");
 
 require("dotenv").config();
 
-app.use(cors());
-app.use(express.json());
-app.use("/uploads", express.static("uploads"));
-
 const corsOptions = {
-  origin: ["http://localhost:4001", "http://78.47.152.86:4001"],
+  origin: [
+    "http://localhost:4001",
+    "http://78.47.152.86:4001",
+    "http://localhost:3000",
+    "https://user-management-ethio-news.vercel.app",
+  ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"], // add any other headers your client sends
+  allowedHeaders: ["Content-Type", "Authorization", "x-auth"], // add any other headers your client sends
 };
 
 // Apply CORS middleware globally
 app.use(cors(corsOptions));
-
-// Handle preflight requests for all routes
-app.options("*", cors(corsOptions));
+app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 app.get("/", (req, res) => {
   res.send("We are on the home page");
@@ -42,5 +42,5 @@ db.once("open", () => {
   console.log("Connected to MongoDB");
 });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 app.listen(port, () => console.log(`Server is running on port ${port}`));

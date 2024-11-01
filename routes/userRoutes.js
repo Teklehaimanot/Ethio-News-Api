@@ -32,4 +32,6 @@ userRouter.patch(
 );
 userRouter.get("/search/:name", userController.searchUserByName);
 
+userRouter.post("/deleteMyData", userController.deleteUserData);
+
 module.exports = userRouter;
