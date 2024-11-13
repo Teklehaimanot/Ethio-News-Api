@@ -5,20 +5,32 @@ const mongoose = require("mongoose");
 
 require("dotenv").config();
 
+// Allowed origins array
+const allowedOrigins = [
+  "http://localhost:4001",
+  "http://78.47.152.86:4001",
+  "http://localhost:3000",
+  "https://user-management-ethio-news.vercel.app",
+  "https://ethionews.smartcsvtool.com",
+];
+
+// CORS options with dynamic origin handling
 const corsOptions = {
-  origin: [
-    "http://localhost:4001",
-    "http://78.47.152.86:4001",
-    "http://localhost:3000",
-    "https://user-management-ethio-news.vercel.app",
-  ],
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization", "x-auth"], // add any other headers your client sends
+  allowedHeaders: ["Content-Type", "Authorization", "x-auth"], // Add any other headers your client sends
 };
 
-// Apply CORS middleware globally
-app.use(cors(corsOptions));
+//app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 

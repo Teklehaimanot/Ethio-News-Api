@@ -17,6 +17,10 @@ const newsSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  sourceUrl: {
+    type: String,
+    required: false,
+  },
   date: {
     type: Date,
     default: Date.now,

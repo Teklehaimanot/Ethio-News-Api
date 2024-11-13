@@ -35,7 +35,7 @@ const createNews = async (req, res) => {
   try {
     await uploadAsync(req, res);
     const imagePath = req.file ? req.file.path : null;
-    const { title, description, date, source } = req.body;
+    const { title, description, date, source, sourceUrl } = req.body;
 
     if (!title || !description || !imagePath) {
       return res.status(400).json({ error: "all fileds are required" });
@@ -46,6 +46,7 @@ const createNews = async (req, res) => {
       image: imagePath,
       date: date ? date : Date.now(),
       source,
+      sourceUrl,
     });
 
     const savedNews = await news.save();
@@ -142,7 +143,7 @@ const updateNews = async (req, res) => {
       }
 
       const imagePath = req.file ? req.file.path : null;
-      const { title, description, date, source } = req.body;
+      const { title, description, date, source, sourceUrl } = req.body;
 
       if (!title || !description) {
         return res.status(400).json({
@@ -161,6 +162,7 @@ const updateNews = async (req, res) => {
       news.description = description;
       news.date = date || news.date;
       news.source = source || news.source;
+      news.sourceUrl = sourceUrl || news.sourceUrl;
 
       if (imagePath) {
         news.image = imagePath;
