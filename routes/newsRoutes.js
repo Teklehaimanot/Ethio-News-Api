@@ -18,7 +18,7 @@ newsRouter.get(
   paginationMiddleware(News, "title"),
   newsController.getAllNews
 );
-newsRouter.get("/bookmarks", newsController.getNewsByIds);
+newsRouter.post("/bookmarks", newsController.getNewsByIds);
 newsRouter.get("/:newsId", newsController.getNewsById);
 newsRouter.post(
   "/createComment/:newsId",
