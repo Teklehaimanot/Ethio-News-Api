@@ -134,13 +134,11 @@ const getNewsById = async (req, res) => {
 const getNewsByIds = async (req, res) => {
   try {
     const { newsIds } = req.body;
-    console.log(newsIds);
     if (!Array.isArray(newsIds) || newsIds.length === 0) {
       return res.status(400).json({ error: "Invalid or empty newsIds array" });
     }
 
     const news = await News.find({ _id: { $in: newsIds } });
-    console.log(news);
 
     if (!news || news.length === 0) {
       return res.status(404).json({ error: "No news items found" });

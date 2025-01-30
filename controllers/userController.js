@@ -2,6 +2,7 @@ const User = require("../models/User");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
 const isValidEmail = require("../utility/validateEmail");
 require("dotenv/config");
 
@@ -235,6 +236,65 @@ const deleteUserData = async (req, res) => {
   }
 };
 
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+console.log(process.env.GOOGLE_CLIENT_ID);
+
+const googleSignIn = async (req, res) => {
+  const { idToken } = req.body;
+
+  try {
+    if (!idToken) {
+      return res.status(400).json({ error: "Google ID Token is required" });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+
+    if (!email) {
+      return res
+        .status(400)
+        .json({ error: "Google account email is required" });
+    }
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        profileImage: picture,
+        role: "user",
+        password: null,
+        active: true,
+        googleId,
+      });
+    }
+
+    // Create JWT token
+    const userData = _.pick(user, ["_id", "email", "role"]);
+    const accessToken = jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET);
+    res.header("x-auth", `Bearer ${accessToken}`).json({
+      success: true,
+      token: `Bearer ${accessToken}`,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        active: user.active,
+        profileImage: user.profileImage,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -245,4 +305,5 @@ module.exports = {
   updateUser,
   searchUserByName,
   deleteUserData,
+  googleSignIn,
 };
