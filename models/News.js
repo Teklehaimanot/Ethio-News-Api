@@ -21,6 +21,25 @@ const newsSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  isImported: {
+    type: Boolean,
+    default: false,
+  },
+  importedAt: {
+    type: Date,
+  },
+  externalId: {
+    type: String,
+  },
+  contentHash: {
+    type: String,
+  },
+  importedVia: {
+    type: String,
+  },
+  content: {
+    type: String,
+  },
   date: {
     type: Date,
     default: Date.now,

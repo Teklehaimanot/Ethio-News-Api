@@ -7,7 +7,7 @@ require("dotenv").config();
 
 // Allowed origins array
 const allowedOrigins = [
-  "http://localhost:4001",
+  "http://localhost:8081",
   "http://78.47.152.86:4001",
   "http://localhost:3000",
   "https://user-management-ethio-news.vercel.app",
@@ -29,7 +29,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "x-auth"], // Add any other headers your client sends
 };
 
-//app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
@@ -41,6 +41,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/user", require("./routes/userRoutes"));
 app.use("/api/v1/news", require("./routes/newsRoutes"));
 app.use("/api/v1/aboutNdmc", require("./routes/aboutNdmcRoute"));
+app.use("/api/v1/pushNotification", require("./routes/pushNotificationRoutes"));
 
 mongoose.connect(process.env.DB_CONNECTION, {
   useNewUrlParser: true,
