@@ -80,6 +80,11 @@ const loginUser = async (req, res) => {
     if (!user.length) {
       return res.status(400).json({ error: "User not found!" });
     }
+    if (!user[0].password) {
+      return res
+        .status(400)
+        .json({ error: "This account uses Google Sign-In. Please sign in with Google." });
+    }
     const isValid = await bcrypt.compare(password, user[0].password);
 
     if (!isValid) {
@@ -237,7 +242,6 @@ const deleteUserData = async (req, res) => {
 };
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-console.log(process.env.GOOGLE_CLIENT_ID);
 
 const googleSignIn = async (req, res) => {
   const { idToken } = req.body;
@@ -247,9 +251,18 @@ const googleSignIn = async (req, res) => {
       return res.status(400).json({ error: "Google ID Token is required" });
     }
 
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      return res.status(500).json({ error: "Google Sign-In is not configured" });
+    }
+
+    const audiences = [
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_ANDROID_CLIENT_ID,
+    ].filter(Boolean);
+
     const ticket = await googleClient.verifyIdToken({
       idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: audiences.length === 1 ? audiences[0] : audiences,
     });
 
     const payload = ticket.getPayload();
@@ -266,12 +279,17 @@ const googleSignIn = async (req, res) => {
       user = await User.create({
         name,
         email,
-        profileImage: picture,
+        profileImage: picture || undefined,
         role: "user",
-        password: null,
         active: true,
         googleId,
       });
+    } else {
+      user.googleId = googleId;
+      user.active = true;
+      if (name) user.name = name;
+      if (picture) user.profileImage = picture;
+      await user.save();
     }
 
     // Create JWT token

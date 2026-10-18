@@ -17,7 +17,10 @@ const UserSchema = {
   },
   password: {
     type: String,
-    required: true,
+    required: false,
+  },
+  googleId: {
+    type: String,
   },
   active: {
     type: Boolean,

@@ -12,6 +12,8 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://user-management-ethio-news.vercel.app",
   "https://ethionews.smartcsvtool.com",
+  "https://ethio-news.diroconsultancy.com",
+  "http://ethio-news.diroconsultancy.com",
 ];
 
 // CORS options with dynamic origin handling
@@ -40,6 +42,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/user", require("./routes/userRoutes"));
 app.use("/api/v1/news", require("./routes/newsRoutes"));
+app.use("/api/v1/image", require("./routes/imageRoutes"));
 app.use("/api/v1/aboutNdmc", require("./routes/aboutNdmcRoute"));
 app.use("/api/v1/pushNotification", require("./routes/pushNotificationRoutes"));
 
